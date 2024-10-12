@@ -92,6 +92,7 @@ response:{ success: Boolean,
  * lacks excess modification to login linked account and error handling
  * filter conversation by(unread, account, tags)  
  * random proxis setup country wise for linkedin APIs 
+ * reduce evade time in python server for faster response
  
 ### deployment
 when deploying to server (AWS, Azure, etc), proxy feature must be developed or else linkedin login will may get error.
