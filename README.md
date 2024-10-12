@@ -2,10 +2,10 @@
 # Linkedin Message Integration 
 Task to integrate linkedin messsages chatbox to personal website, task by bearconnect.
 
-## how to run
+## How to run
 There are two folders for frontend and backend, open both folders setup env variables and do following:
 
-### frontend
+### Frontend
 Frontend built using vite-react, for state management redux is used.
 
 ```bash
@@ -17,7 +17,7 @@ available routes are
 * /app/linkedin-accounts 
 * /app/inbox 
 
-### backend
+### Backend
 backend built using nodejs as well as python. were node sever is dependant on python server for linkedin related operations
 
 * Nodejs API server
@@ -59,22 +59,22 @@ Node api routes are
 * /api/account/connected-accounts GET
 
 * /api/utils/getConversations
-```js
-method:GET
-response:{ success: Boolean, 
+  ```js
+  method:GET
+  response:{ success: Boolean, 
     data: { 
         convs:Array, 
         paging:Object, 
         errors:Object, 
         unreads:Number 
-    } 
-}
-```
+     } 
+   }
+  ```
 * /api/utils/getConversation/:id?conv= GET
-```js
-  method:GET
-  response:{success:Boolean, data:{messages:Array}}
-```
+  ```js
+   method:GET
+   response:{success:Boolean, data:{messages:Array}}
+  ```
 * /api/utils/:id/sendMessage
   ```js
   method: POST 
@@ -82,13 +82,21 @@ response:{ success: Boolean,
   response:{success:Boolean, value:Object, message:String}
   ```
 
-### features
+### Screenshota
+<div align="center">
+  <div>
+    <img src="./screenshots/accounts.png" alt="Connected Accounts" width="400px"></img>
+    <img src="./screenshots/inbox.png" alt="Unibox" width="400px" ></img>
+  </div>
+</div>
+
+### Features
  * can login multiple linkedin account
  * get convrsations for all connected accounts
  * get messages for selected conversatoin
  * can send messages to selected conversation
 
-### need modification
+### Need modification
  * lacks excess modification to login linked account and error handling
  * filter conversation by(unread, account, tags)  
  * random proxis setup country wise for linkedin APIs 
