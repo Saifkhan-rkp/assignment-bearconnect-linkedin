@@ -4,7 +4,7 @@ import { formatExactDate } from '../../utils/utils';
 function MessageList({ sendingMessage, messages = [], from = {}, chattingWith = {} }) {
     let lastPrintedDate = null;
     // const [optMessages, optfn] = useOp
-    console.log(messages)
+
     return (
         <div className="flex flex-col space-y-2">
             {messages.map((message, idx) => {

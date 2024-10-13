@@ -52,7 +52,7 @@ function useFetchAppData() {
         [callback, dispatch, unibox, isLoading]
     );
 
-    const sendMessage = useCallback((data = { message: "" }, setError) => {
+    const sendMessage = useCallback((data = { message: "", setError:()=>{} }, setError) => {
         setSendingMsg(true)
         if (!data.message || data.message === "") {
             setError("message not to empty")
@@ -61,13 +61,14 @@ function useFetchAppData() {
         authApi.post(`utils/${accessId}/sendMessage`, { message: data.message, messageId: urn })
             .then(res => {
                 console.log(res.data);
-                if (res.data?.status) {
+                if (res.data?.success) {
                     dispatch(unibox.updateMessageList({message:data.message, createdAt: res.data?.value?.createdAt || Date.now()}))
                 }
                 setSendingMsg(false)
             }).catch(err => {
-                setSendingMsg(false)
-                setError(err?.response?.data?.message || err?.message)
+                setSendingMsg(false);
+                // data?.setError(true);
+                setError(err?.response?.data?.message || err?.message, message)
             })
     }, [urn, accessId, sendingMsg, dispatch, unibox])
     return { getConnectedAccounts, getConversations, getConversation, sendMessage, authApi, unibox, isLoading, sendingMsg }

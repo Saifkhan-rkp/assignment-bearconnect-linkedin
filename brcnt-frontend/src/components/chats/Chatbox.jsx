@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import MessageList from './MessageList'
 import { useSelector } from 'react-redux'
 import useFetchAppData from '../../hooks/useFetchAppData';
@@ -9,20 +9,24 @@ import { useRef } from 'react';
 
 function Chatbox({ }) {
     const { getConversation, isLoading, sendMessage, sendingMsg } = useFetchAppData()
-    const inputRef = useRef(null)
-    const { messages: msgs, chattingFrom, chattingWith, urn, accessId } = useSelector(state => state.unibox?.conversation);
-    const messages = [...msgs].sort((a, b) => a.createdAt - b.createdAt)
+    // const [error, setError] = useState(false);
+    const inputRef = useRef()
+    const { messages, chattingFrom, chattingWith, urn, accessId } = useSelector(state => state.unibox?.conversation);
     useEffect(() => {
         getConversation((err) => toast.error(err));
     }, [urn, accessId]);
     const onSend = () => {
-        const message = inputRef.current?.value;
+        const message = inputRef?.current?.value;
         console.log(message);
         if (message && message !== "") {
-            sendMessage({ message }, (err) => toast.error(err))
-            // toast(message)
+            inputRef.current.value = "";
+            sendMessage({ message, }, (err, message) => { 
+                toast.error(err)
+                inputRef.current.value = message;
+            })
         }
     }
+
     return (
         <>
             <div className="h-full flex flex-col">
@@ -35,7 +39,7 @@ function Chatbox({ }) {
                         </div>
                     </div>
                     <div className="relative inline-block text-left">
-                        <button id="refetch" className="hover:bg-gray-200 rounded-md p-1">
+                        <button id="refetch" onClick={()=> getConversation((err) => toast.error(err))} className="hover:bg-gray-200 rounded-md p-1">
                             <i className='fas fa-light fa-arrows-rotate fa-lg '></i>
                         </button>
                     </div>

@@ -11,8 +11,8 @@ function Unibox() {
     const isLoading = useOutletContext()
     const dispatch = useDispatch();
     const { unibox } = useFetchAppData()
-    const { chats, conversation } = useSelector(state => state.unibox)
-
+    const { chats: convos, conversation } = useSelector(state => state.unibox)
+    const chats = [...convos].sort((a, b) => b.lastMessageAt - a.lastMessageAt)
     return (
         <>
             {/* Main Content */}
@@ -43,7 +43,7 @@ function Unibox() {
                         <div className="flex-auto overflow-y-auto overflow-x-hidden bg-white rounded-bl-lg">
                             {isLoading && <LoaderMini />}
                             {
-                                chats?.map(con => {
+                                chats?.map((con, idx) => {
                                     const imageUrl = con?.correspondentProfile?.imageUrl?.rootUrl ?
                                         `${con?.correspondentProfile?.imageUrl?.rootUrl}${con?.correspondentProfile?.imageUrl?.artifacts[0]?.fileIdentifyingUrlPathSegment}` :
                                         `https://ui-avatars.com/api/?size=40&name=${con?.correspondentProfile?.firstName + "+" + con?.correspondentProfile?.lastName}&background=random`;
@@ -52,7 +52,7 @@ function Unibox() {
                                         `${imageUrlLi?.rootUrl}${imageUrlLi?.artifacts[0]?.fileIdentifyingUrlPathSegment}` :
                                         `https://ui-avatars.com/api/?size=40&name=${con.linkedinAccount?.account.linkedInUserProfile.firstName + "+" + con.linkedinAccount?.account.linkedInUserProfile.lastName}&background=random`;
                                     return (
-                                        <div className={`flex h-1/5 cursor-pointer border-b ${con?.id === conversation?.urn ? "bg-slate-200" : ""}`} key={con.id}>
+                                        <div className={`flex h-1/5 cursor-pointer border-b ${con?.id === conversation?.urn ? "bg-slate-200" : ""}`} key={idx}>
                                             <div className='flex items-center pb-2 pt-2 px-5 justify-between w-4/5'>
                                                 <div className='relative flex flex-0 items-center justify-start'>
                                                     <input type="checkbox" className="relative top-0 w-5 h-5" />
