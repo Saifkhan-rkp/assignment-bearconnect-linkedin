@@ -22,12 +22,15 @@ def default_evade():
     sleep(random.randint(2, 5))  # sleep a random duration to try and evade suspention
 
 class Linkedin(object):
-    def __init__(self, email:str="", *, password:str = "", load:str="",load_cookie=False, proxis={}, debug=False, cookies=None, cookies_dir:str ="") -> None:
+    def __init__(self, email:str="", *, password:str = "", load:str="",load_cookie=False, proxis={}, debug=False, isOtpSubmission=False, cookies_dir:str ="") -> None:
         self.username = email
         self.password = password
         self.load = load
-        self.client = Client(proxis=proxis)
-        
+        if isOtpSubmission and load_cookie:
+            self.client = Client(proxis=proxis, load_cookies=True, cookieName=load)
+        else:
+            self.client = Client(proxis=proxis)
+
         logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
         self.logger = logger
 
@@ -45,23 +48,23 @@ class Linkedin(object):
         res = self.client.login(self.username, pswd, id)
         return {"isLoggedIn":res=="loggedin", "isOtpSent":res=="otp_sent"}
 
-    def submitOTP(self, username, otp, id=""):
-        isLoggedIn = self.client.submitOTP(otp, username=username, id=id)
-        return isLoggedIn
+    def submitOTP(self, otp, id=""):
+        res = self.client.submitOTP(otp, id=id)
+        return res
 
     def set_session_cookie(self):
         self.client._set_session_cookies(CookieRepository().get(self.load))
         
     def _fetch(self, uri: str, evade=default_evade, base_request=False, **kwargs):
         """GET request to Linkedin API"""
-        evade()
+        # evade()
 
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.get(url, **kwargs)
 
     def _post(self, uri: str, evade=default_evade, base_request=False, **kwargs):
         """POST request to Linkedin API"""
-        evade()
+        # evade() # evade time removed while requesting
 
         url = f"{self.client.API_BASE_URL if not base_request else self.client.LINKEDIN_BASE_URL}{uri}"
         return self.client.session.post(url, **kwargs)

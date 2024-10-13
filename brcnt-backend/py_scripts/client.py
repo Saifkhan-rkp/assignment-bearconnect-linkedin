@@ -38,7 +38,7 @@ class Client(object):
         # "x-li-track": '{"clientVersion":"1.2.6216","osName":"web","timezoneOffset":10,"deviceFormFactor":"DESKTOP","mpName":"voyager-web"}',
     }
 
-    def __init__(self, *, proxis={}, username:Optional[str]= None, load_cookies=False):
+    def __init__(self, *, proxis={}, cookieName:Optional[str]= None, load_cookies=False):
         
         # Simulate browser with cookies enabled
         self._cj_repo = CookieRepository()
@@ -48,8 +48,8 @@ class Client(object):
         self.metadata = {}
         self.logger = logger
         self.cj= reqcookies.RequestsCookieJar()
-        if username and load_cookies:
-            self.cj.update(self._cj_repo.get(username))
+        if cookieName and load_cookies:
+            self.cj.update(self._cj_repo.get(cookieName) or reqcookies.RequestsCookieJar())
         
         self.opener = urllib.request.build_opener(
             urllib.request.HTTPRedirectHandler(),
@@ -96,7 +96,7 @@ class Client(object):
             # Quick and dirty solution for 404 returns because of network problems
             # However, this could infinite loop if there's an actual problem
             self.logger.info("Exception on {} load: {}".format(url, e))
-            return None, None
+            return response, None
             # return self.loadPage(url, data)
 
     def loadSoup(self, url, data=None):
@@ -131,6 +131,7 @@ class Client(object):
             # print("OTP required. Waiting for user input...")
             self.logger.info("otp sent for login - {}".format(username))
             self.logger.info("before dumping OTP FILE - {}".format(id))
+            self._cj_repo.save(self.cj, id)
             self.dumpOTPContent(content, id)
             # otp = input("Enter the OTP sent to your registered device: ")
             # self.submitOTP(otp, content)
@@ -150,16 +151,18 @@ class Client(object):
             return "loggedin"
         
 
-    def submitOTP(self, otp, username:str, id:str):
+    def submitOTP(self, otp, id:str):
         """
         Handle the OTP submission.
         """
         content = self.loadOTPContent(id)
+        # self._set_session_cookies(self._cj_repo.get(id))
+        # self.opener.add_handler()
         if content:
             soup = BeautifulSoup(content, "html.parser")
             self.logger.info("Sipping Soup") 
         else:
-            self.logger.info("HTML Content Not Found") 
+            self.logger.info("OTP HTML Content Not Found") 
             return False
 
         otp_data = urllib.parse.urlencode({
@@ -180,7 +183,7 @@ class Client(object):
 
         # print(otp_data)
         # Submit OTP and complete login
-        _, cont = self.loadPage("https://www.linkedin.com/checkpoint/challenge/verify", otp_data)
+        res, cont = self.loadPage("https://www.linkedin.com/checkpoint/challenge/verify", otp_data)
         
         dumpfile = self._getOTPDumpFilePath(id)
         if os.path.isfile(dumpfile) or os.path.islink(dumpfile):
@@ -190,9 +193,9 @@ class Client(object):
             #Login successful after OTP verification
             # self._fetch_metadata()
             self._cj_repo.save(self.cj, id)
-            return True
+            return {"success":True, "status": res.getcode()}
         
-        return False
+        return {"success":False, "status": res.getcode() or 403}
 
     def loadTitle(self):
         soup = self.loadSoup("https://www.linkedin.com/feed/")

@@ -52,7 +52,7 @@ function AccountSiginModal() {
                 }
             }).catch(err => {
                 toast.error(err.response?.data?.message||err?.message||"An error occured while login")
-                console.log("an error occured", err.message)
+                console.log("an error occured :", err?.response?.data)
             })
         } else {
             const { email, password } = getValues();

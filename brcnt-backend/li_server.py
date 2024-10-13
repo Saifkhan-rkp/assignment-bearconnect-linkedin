@@ -81,7 +81,7 @@ def post(id, req):
     if email:
         api = Linkedin(body["email"], load_cookie=False, debug=True)
     else:
-        api = Linkedin(load=id,load_cookie=True, debug=True )
+        api = Linkedin(load=id,load_cookie=True, debug=True, isOtpSubmission= req=="otp_submit" )
     
     # Parameter req
     if req == "login":
@@ -90,9 +90,8 @@ def post(id, req):
         return jsonify({"data":result}), 201
  
     if req == "otp_submit":
-        print(body["email"], body["otp"], id)
-        result = api.submitOTP(body["email"], body["otp"], id=id)
-        return jsonify({"data":{"isLoggedIn":result}}), 201
+        result = api.submitOTP(body["otp"], id=id)
+        return jsonify({"data":result}), result.get("status", 201)
  
     if req == "send_message":
         result, status = api.send_message(body["message"], body["convoId"])

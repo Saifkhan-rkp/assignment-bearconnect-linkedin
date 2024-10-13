@@ -22,7 +22,7 @@ const saveAccountData = async (result = {}) => {
     result.account.username = `${profile?.miniProfile?.firstName} ${profile?.miniProfile?.lastName}`
     result.account.linkedInUserProfile.fullName = result.account.username
     result.account.linkedInUserProfile.firstName = profile?.miniProfile?.firstName
-    result.account.linkedInUserProfile.imageUrl = profile?.miniProfile?.picture["com.linkedin.common.VectorImage"] || {}
+    result.account.linkedInUserProfile.imageUrl = profile?.miniProfile?.picture?.["com.linkedin.common.VectorImage"] || {}
     result.account.linkedInUserProfile.lastName = profile?.miniProfile?.lastName
     result.account.linkedInUserProfile.urn = profile?.miniProfile?.dashEntityUrn.split(":").pop()
     result.account.linkedInUserProfile.accountId = profile?.plainId
@@ -109,14 +109,14 @@ const submitLoginOtp = catchAsync(async (req, res) => {
     if (!account) {
         throw new NotFoundError("Login account document not found")
     }
-    const logData = await axios.post(`${LI_API}/${id}/otp_submit`, { email, otp, id })
-    if (logData?.data?.data?.isLoggedIn) {
+    const logData = await axios.post(`${LI_API}/${id}/otp_submit`, { otp, id })
+    if (logData?.data?.data?.success) {
         const accData = await saveAccountData(account);
         accData.save();
 
         const acc = accData.toObject();
         return res.status(201).json({ success: Object.keys(acc).length > 0, data: acc, message: "Logged in successfully" });
     }
-    return res.status(500).json({ success: false, message: "Unable to login to account." })
+    return res.status(logData.status || 500).json({ success: false, message: "Unable to login to account.", error: logData?.data?.data})
 })
 module.exports = { getLinked_accounts, createLinked_accounts, updateLinked_accounts, deleteLinked_accounts, submitLoginOtp }
