@@ -33,3 +33,6 @@ convo.json
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# py chache
+*.pyc
